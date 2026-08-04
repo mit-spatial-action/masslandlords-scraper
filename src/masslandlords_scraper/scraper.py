@@ -15,15 +15,17 @@ WEEKLY = "/".join([URL, "filings-week-ending"])
 MONTHLY = "/".join([URL, "filings-month"])
 RESULTS = []
 WEEKLY_CSV = "weekly-filings.csv"
+MONTHLY_CSV = "weekly-filings.csv"
 
-def create_date_list(start_date, end_date = False, freq="monthly"):
+
+def create_date_list(start_date, end_date=False, freq="monthly"):
     """
     Create a list of week starts between a start and end date.
     """
-    if freq=="monthly":
+    if freq == "monthly":
         delta = relativedelta(months=1)
         fmt = "%Y-%m"
-    elif freq=="weekly":
+    elif freq == "weekly":
         delta = relativedelta(days=7)
         fmt = "%Y-%m-%d"
         end_date = datetime.strptime("2023-07-01", "%Y-%m-%d")
@@ -37,33 +39,24 @@ def create_date_list(start_date, end_date = False, freq="monthly"):
         start_date += delta
     return date_list
 
+
 def parse_page(page_request):
     """
     Parses requested page.
     """
-    results = {
-        "E": 0,
-        "C": 0,
-        "MS": 0,
-        "NE": 0,
-        "SE": 0,
-        "W": 0
-    }
+    results = {"central": 0, "eastern": 0, "metro_south": 0, "northeast": 0, "southeast": 0, "western": 0}
     page = page_request.text.split()
-    for i in range(len(page)): 
-        if page[i] == "central" and page [i-1] != "bmc":
-            results["C"] = page[i+1]
-        if page[i] == "eastern" and page[i+1] != "hampshire":
-            results["E"] = page[i+1]
-        if page[i] == "metro_south":
-            results["MS"] = page[i+1]
-        if page[i] == "northeast":
-            results["NE"] = page[i+1]
-        if page[i] == "southeast":
-            results["SE"] = page[i+1]
-        if page[i] == "western":
-            results["W"] = page[i+1]
+    for i in range(len(page) - 1):
+        if (page[i - 1][-1] == "%" or page[i - 1] == "Percent") & page[i + 1].isdigit():
+            if page[i] in results.keys():
+                results[page[i]] = page[i + 1]
+            else:
+                continue
+        else:
+            continue
+    print(results)
     return results
+
 
 def main():
     for date in create_date_list(START_DATE, freq="weekly"):
@@ -74,7 +67,7 @@ def main():
             continue
         else:
             results = parse_page(request)
-            results['date'] = date
+            results["date"] = date
             RESULTS.append(results)
         # Be courteous.
         sleep(1.5)
@@ -82,10 +75,9 @@ def main():
     with open(WEEKLY_CSV, "w") as csvfile:
         # creating a csv writer object
         writer = DictWriter(
-            csvfile, 
-            fieldnames = ["date", "E", "C", "MS", "NE", "SE", "W"]
-            ) 
+            csvfile, fieldnames=["date", "central", "eastern", "metro_south", "northeast", "southeast", "western"]
+        )
         # Write the header.
         writer.writeheader()
-        # writing the data rows 
+        # writing the data rows
         writer.writerows(RESULTS)
