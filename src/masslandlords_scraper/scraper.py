@@ -54,7 +54,7 @@ def parse_page(page_request):
             results["W"] = page[i+1]
     return results
 
-def run():
+def main():
     for date in create_weeks_list(START_DATE):
         request = get(URL_BASE + date)
         print(f"Attempting to download {date}.")
@@ -78,6 +78,3 @@ def run():
         writer.writeheader()
         # writing the data rows 
         writer.writerows(RESULTS)
-
-if __name__ == "__main__":
-    run()

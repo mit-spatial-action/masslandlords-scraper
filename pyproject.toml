@@ -1,0 +1,19 @@
+[project]
+name = "masslandlords_scraper"
+version = "1.1.0"
+description = "A simple scraper to collect weekly eviction filing counts from MassLandlords. Used for count validation."
+readme = "README.md"
+authors = [
+    { name = "Eric Robsky Huntley", email = "ehuntley@mit.edu" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "requests==2.33.1"
+]
+
+[project.scripts]
+masslandlords_scraper = "masslandlords_scraper:main"
+
+[build-system]
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"
