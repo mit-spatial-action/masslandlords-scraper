@@ -2,12 +2,12 @@
 
 <img width="421" alt="mll_screenshot" src="https://user-images.githubusercontent.com/10646361/225936089-c8fa5233-72bd-46c2-b211-99d2ddf37e51.png">
 
-An exremely simple Python scraper to collect weekly [eviction filing counts from MassLandlords](https://masslandlords.net/policy/eviction-data/). We use these counts to validate the number of filings we're retrieving using our [filing downloader tool](https://github.com/Unnamed-Lab-DUSP/filing_downloader). It fetches all counts starting from the week ending 10-24-2020 and continuing through the most recent available week.
+A very simple scraper to collect weekly and monthly[eviction filing counts from MassLandlords](https://masslandlords.net/policy/eviction-data/). We use these counts to validate the number of filings we're retrieving from MassCourts using our semi-automated internal systems. It fetches all counts starting from the week ending 10-24-2020 and continuing through the most recent available week. __Note that MassLandlords stopped posting weekly reports in July of 2023, so no weekly counts will be retrieved beyond that date.__
 
 ## Contributors
 
-+ [Eric Robsky Huntley, PhD](https://github.com/ericrobskyhuntley) (💻, 🤔)
-+ [Ever Real](https://github.com/anastasia) (💻, 🤔)
++ [Eric Robsky Huntley](https://github.com/ericrobskyhuntley) (💻, 🤔)
++ [Ever Real](https://github.com/qbious) (💻, 🤔)
 
 ## Setting Up Your Environment
 
@@ -39,6 +39,16 @@ To run the rool, use `uv run`:
 ```bash
 uv run masslandlords_scraper
 ```
+
+### Command Line Usage
+
+We provide a few arguments to support querying for subsets (by date) and selecting the location of output files.
+
+| Short | Long Flag | Type | Default | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `-s` | `--start` | `String` | `2020-10-24` | Start date. |
+| `-e` | `--end` | `String` | `datetime.today().strftime("%Y-%m-%d")` | End date. |
+| `-p` | `--path`| `String`| `./` | Path to output CSV files. |
 
 ## Activating Your Environment
 
