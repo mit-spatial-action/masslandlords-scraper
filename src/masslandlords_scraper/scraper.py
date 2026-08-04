@@ -4,26 +4,37 @@
 from requests import get
 from csv import DictWriter
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from datetime import timedelta
 from time import sleep
 from os import path
 
 START_DATE = datetime.strptime("2020-10-24", "%Y-%m-%d")
-URL_BASE = "https://masslandlords.net/policy/eviction-data/filings-week-ending-"
+URL = "https://masslandlords.net/policy/eviction-data"
+WEEKLY = "/".join([URL, "filings-week-ending"])
+MONTHLY = "/".join([URL, "filings-month"])
 RESULTS = []
-OUT_FILE = path.join("results", "weekly-filings.csv")
+WEEKLY_CSV = "weekly-filings.csv"
 
-def create_weeks_list(start_date, end_date = False):
+def create_date_list(start_date, end_date = False, freq="monthly"):
     """
     Create a list of week starts between a start and end date.
     """
+    if freq=="monthly":
+        delta = relativedelta(months=1)
+        fmt = "%Y-%m"
+    elif freq=="weekly":
+        delta = relativedelta(days=7)
+        fmt = "%Y-%m-%d"
+        end_date = datetime.strptime("2023-07-01", "%Y-%m-%d")
+    else:
+        raise SystemExit(f"Error: {freq} is not a valid frequency.")
     if not end_date:
         end_date = datetime.today()
     date_list = []
-    weekly = start_date
-    while weekly <= end_date:
-        date_list.append(weekly.strftime("%Y-%m-%d"))
-        weekly += timedelta(days=7)
+    while start_date <= end_date:
+        date_list.append(start_date.strftime(fmt))
+        start_date += delta
     return date_list
 
 def parse_page(page_request):
@@ -55,8 +66,8 @@ def parse_page(page_request):
     return results
 
 def main():
-    for date in create_weeks_list(START_DATE):
-        request = get(URL_BASE + date)
+    for date in create_date_list(START_DATE, freq="weekly"):
+        request = get(f"{WEEKLY}-{date}")
         print(f"Attempting to download {date}.")
         if request.status_code == 404:
             print(f"😞 No data available for {date}. 😞")
@@ -68,7 +79,7 @@ def main():
         # Be courteous.
         sleep(1.5)
 
-    with open(OUT_FILE, "w") as csvfile:
+    with open(WEEKLY_CSV, "w") as csvfile:
         # creating a csv writer object
         writer = DictWriter(
             csvfile, 
